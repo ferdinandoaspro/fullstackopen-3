@@ -50,5 +50,24 @@ app.delete("/api/persons/:id", (req, res) => {
     res.status(204).end()
 })
 
+app.use(express.json())
+
+app.post("/api/persons", (req, res) => {
+  const body = req.body
+  const generateId = () => {
+  const maxId = persons.length > 0 ? Math.floor(Math.random() * (1000 - 4) + 4) : 0
+  return maxId + 1
+  }
+
+  const person = {
+    id: generateId(),
+    ...body
+  }
+
+  persons = persons.concat(person)
+
+  res.json(person)
+})
+
 const PORT = 3001
 app.listen(PORT)
