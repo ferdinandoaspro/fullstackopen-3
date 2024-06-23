@@ -54,6 +54,7 @@ app.use(express.json())
 
 app.post("/api/persons", (req, res) => {
   const body = req.body
+  const nameExists = persons.map(person => person.name).includes(body.name)
   const generateId = () => {
   const maxId = persons.length > 0 ? Math.floor(Math.random() * (1000 - 4) + 4) : 0
   return maxId + 1
@@ -64,9 +65,28 @@ app.post("/api/persons", (req, res) => {
     ...body
   }
 
-  persons = persons.concat(person)
+  if (!body.name) {
+    return res.status(400).json({
+      error: "name is missing"
+    })
+  }
 
-  res.json(person)
+  if (!body.number) {
+    return res.status(400).json({
+      error: "number is missing"
+    })
+  }
+
+  if (nameExists) {
+    return res.status(400).json({
+      error: "name must be unique"
+    })
+  }
+
+  if (body) {
+    persons = persons.concat(person)
+    res.json(person)
+  }
 })
 
 const PORT = 3001
