@@ -1,6 +1,9 @@
 const express = require("express")
 const morgan = require("morgan")
 const app = express()
+morgan.token("postData", (req, res) => JSON.stringify(req.body))
+const isPost = (req, res) => req.method === "POST"
+const isNotPost = (req, res) => req.method !== "POST"
 
 let persons = [
     { 
@@ -25,7 +28,8 @@ let persons = [
     }
 ]
 
-app.use(morgan("tiny"))
+app.use(morgan("tiny", {skip: isPost}))
+app.use(morgan(":method :url :status :res[content-length] - :response-time ms :postData", {skip: isNotPost}))
 
 
 app.get('/info', (req, res) => {
