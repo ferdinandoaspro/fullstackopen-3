@@ -1,5 +1,6 @@
 const express = require("express")
 const morgan = require("morgan")
+const cors = require("cors")
 const app = express()
 morgan.token("postData", (req, res) => JSON.stringify(req.body))
 const isPost = (req, res) => req.method === "POST"
@@ -28,6 +29,7 @@ let persons = [
     }
 ]
 
+app.use(cors())
 app.use(morgan("tiny", {skip: isPost}))
 app.use(morgan(":method :url :status :res[content-length] - :response-time ms :postData", {skip: isNotPost}))
 
