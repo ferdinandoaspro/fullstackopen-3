@@ -1,20 +1,16 @@
 const mongoose = require("mongoose")
 
-if (process.argv.length<3) {
-
-    console.log('give password as argument')
-    process.exit(1)
-}
-
-const password = process.argv[2]
-const name = process.argv[3]
-const number = process.argv[4]
-
-const url = `mongodb+srv://fullstack:${password}@cluster0.mmz5kqe.mongodb.net/phonebook?retryWrites=true&w=majority&appName=Cluster0`
+const url = process.env.MONGODB_URL
 
 mongoose.set("strictQuery", false)
 
 mongoose.connect(url)
+    .then(result => {
+      console.log('connected to MongoDB')
+    })
+    .catch(error => {
+      console.log('error connecting to MongoDB:', error.message)
+    })
 
 const personSchema = new mongoose.Schema({
 
@@ -23,7 +19,20 @@ const personSchema = new mongoose.Schema({
     number: {type: Number, required: true}
 })
 
+personSchema.set('toJSON', {
+    transform: (document, returnedObject) => {
+      returnedObject.id = returnedObject._id.toString()
+      delete returnedObject._id
+      delete returnedObject.__v
+  }
+})
+    
+/*
+
 const Person = mongoose.model("Person", personSchema)
+
+const name = process.argv[2]
+const number = process.argv[3]
 
 const person = new Person({
 
@@ -52,3 +61,5 @@ if (process.argv.length == 3) {
     })
 }
 
+*/
+module.exports = mongoose.model("Person", personSchema)
