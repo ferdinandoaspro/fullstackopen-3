@@ -49,6 +49,7 @@ app.use(express.json())
 
 app.post("/api/persons", (req, res) => {
   const body = req.body
+  const nameExists = Person.find({name: body.name})
   const generateId = () => {
     const maxId = Math.floor(Math.random() * 1000)
     return maxId + 1
@@ -59,9 +60,41 @@ app.post("/api/persons", (req, res) => {
     ...body
   })
 
+  if (!body.name) {
+    return res.status(400).json({
+      error: "name is missing"
+    })
+  }
+
+  if (!body.number) {
+    return res.status(400).json({
+      error: "number is missing"
+    })
+  }
+
+  if (nameExists.length > 0) {
+    return res.status(400).json({
+      error: "name must be unique"
+    })
+  }
+
   person.save().then(newPerson => {
     res.json(newPerson)
   })
+})
+
+app.put("/api/persons/:id", (req, res, next) => {
+  const body = req.body
+  const person = {
+    name: body.name,
+    number: body.number,
+  }
+
+  Person.findByIdAndUpdate(req.params.id, person, {new: true})
+    .then(updatedPerson => {
+      res.json(updatedPerson)
+    })
+    .catch(error => next(error))
 })
 
 const errorHandler = (error, req, res, next) => {

@@ -16,7 +16,7 @@ Content-Type: application/json
 
 ###
 
-POST https://fullstackopen-3-euy3.onrender.com/api/persons HTTP/1.1
+POST http://localhost:3001/api/persons HTTP/1.1
 Content-Type: application/json
 
 {
@@ -39,5 +39,13 @@ POST https://fullstackopen-3-euy3.onrender.com/api/persons HTTP/1.1
 Content-Type: application/json
 
 {
+    "number": "5555"
+}
+###
+PUT http://localhost:3001/api/persons/66865dbe00af347d625e66f8 HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "Ada Lovelace",
     "number": "5555"
 }
