@@ -9,11 +9,12 @@ morgan.token("postData", (req, res) => JSON.stringify(req.body))
 const isPost = (req, res) => req.method === "POST"
 const isNotPost = (req, res) => req.method !== "POST"
 
+// Routes and middleware for errors
+
 app.use(cors())
 app.use(express.static("dist"))
 app.use(morgan("tiny", {skip: isPost}))
 app.use(morgan(":method :url :status :res[content-length] - :response-time ms :postData", {skip: isNotPost}))
-
 
 app.get('/info', (req, res) => {
     res.end(`<p>Phonebook has info for ${Person.length} people</p><p>${new Date().toString()}</p>`)
@@ -36,14 +37,12 @@ app.get("/api/persons/:id", (req, res) => {
     }
 })
 
-app.delete("/api/persons/:id", (req, res) => {
+app.delete("/api/persons/:id", (req, res, next) => {
     Person.findByIdAndDelete(req.params.id)
       .then(person => {
         res.status(204).end()
       })
-      .catch(error => {
-        res.status(400).send({error: "malformatted id"})
-      })
+      .catch(error => next(error))
 })
 
 app.use(express.json())
@@ -64,6 +63,15 @@ app.post("/api/persons", (req, res) => {
     res.json(newPerson)
   })
 })
+
+const errorHandler = (error, req, res, next) => {
+  if (error.name === "CastError") {
+    return res.status(400).send({error: "malformatted id"})
+  }
+  next(error)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT)
